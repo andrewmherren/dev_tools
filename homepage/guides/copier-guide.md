@@ -1,3 +1,7 @@
+<!--
+Generated file. Source: template/README.md
+Update source docs, then run: python scripts/sync-homepage-docs.py
+-->
 # Copier Template Guide
 
 This directory contains the unified single-command Copier flow.

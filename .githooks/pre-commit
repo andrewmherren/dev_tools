@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+set -e
+
+if command -v python3 >/dev/null 2>&1; then
+  python3 scripts/sync-homepage-docs.py --quiet
+elif command -v python >/dev/null 2>&1; then
+  python scripts/sync-homepage-docs.py --quiet
+elif [ -x "scripts/sync-homepage-docs.sh" ]; then
+  sh scripts/sync-homepage-docs.sh --quiet
+elif command -v pwsh >/dev/null 2>&1; then
+  pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/sync-homepage-docs.ps1 -Quiet
+elif command -v powershell >/dev/null 2>&1; then
+  powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-homepage-docs.ps1 -Quiet
+else
+  echo "Skipping homepage docs sync: no supported runtime found (python/pwsh/powershell)" >&2
+fi
+
+git add homepage/guides/*.md >/dev/null 2>&1 || true

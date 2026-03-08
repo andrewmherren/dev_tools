@@ -1,3 +1,7 @@
+<!--
+Generated file. Source: README.md
+Update source docs, then run: python scripts/sync-homepage-docs.py
+-->
 # Dev Environment Infrastructure
 
 A Docker-based shared infrastructure server providing AI-driven development tools, code quality analysis, CI/CD, and security scanning for local development projects.
@@ -48,15 +52,15 @@ docker compose up -d
 
 ## Project Scaffolding
 
-Start new projects using the unified Copier template. See **[Copier Template Guide](template/README.md)** for quick start, language/mode options, merge behavior, and update workflow (`copier update`). For convenience, see **[Command Shortcuts](template/README.md#command-shortcuts)** to create shell aliases like `devtools-new my_project`.
+Start new projects using the unified Copier template. See **[Copier Template Guide](guides/copier-guide.md)** for quick start, language/mode options, merge behavior, and update workflow (`copier update`). For convenience, see **[Command Shortcuts](guides/copier-guide.md#command-shortcuts)** to create shell aliases like `devtools-new my_project`.
 
 ## Documentation
 
 - **[Server Day-to-Day Guide](README.md)** — Start, verify, inspect, and maintain the dev tools server
-- **[Copier Project Day-to-Day Guide](template/README.md)** — Create and update projects with the unified template
-- **[Project Integration Guide](homepage/PROJECT_SETUP.md)** — Connect downstream projects to shared services
-- **[Safe Integration Patterns](docs/git-safety.md)** — Credential and local-only safety practices
-- **[MCP Servers & Policy](docs/mcp-policy.md)** — MCP endpoints, auth, and usage policy
+- **[Copier Project Day-to-Day Guide](guides/copier-guide.md)** — Create and update projects with the unified template
+- **[Project Integration Guide](guides/project-integration.md)** — Connect downstream projects to shared services
+- **[Safe Integration Patterns](guides/git-safety.md)** — Credential and local-only safety practices
+- **[MCP Servers & Policy](guides/mcp-policy.md)** — MCP endpoints, auth, and usage policy
 
 ### Homepage-Served Docs
 

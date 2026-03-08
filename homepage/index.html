@@ -22,13 +22,13 @@
         <!-- Services View -->
         <div id="servicesView" class="view">
             <div class="documentation">
-                <a href="#" class="doc-card" onclick="openDoc(event, 'README.md')">
-                    <div class="doc-title">📖 Infrastructure Guide</div>
-                    <div style="font-size: 0.8em; color: var(--text-secondary);">Full documentation & architecture</div>
+                <a href="#" class="doc-card" onclick="openDoc(event, 'guides/server-guide.md')">
+                    <div class="doc-title">📖 Day-to-Day Server Guide</div>
+                    <div style="font-size: 0.8em; color: var(--text-secondary);">Start, verify, inspect, and maintain services</div>
                 </a>
-                <a href="#" class="doc-card" onclick="openDoc(event, 'PROJECT_SETUP.md')">
-                    <div class="doc-title">⚙️ Project Setup</div>
-                    <div style="font-size: 0.8em; color: var(--text-secondary);">Integration guide</div>
+                <a href="#" class="doc-card" onclick="openDoc(event, 'guides/copier-guide.md')">
+                    <div class="doc-title">⚙️ Day-to-Day Project Guide</div>
+                    <div style="font-size: 0.8em; color: var(--text-secondary);">Create and update projects with Copier</div>
                 </a>
             </div>
 
@@ -311,7 +311,7 @@
             const content = document.getElementById('markdownContent');
 
             try {
-                const response = await fetch(`./ ${docPath}`);
+                const response = await fetch(`./${docPath}`);
                 const markdown = await response.text();
                 const html = window.marked.parse(markdown);
                 content.innerHTML = html;
@@ -324,9 +324,9 @@
                 showDocView(title);
 
                 // Add to browser history
-                window.history.pushState({ doc: docPath }, title, `? doc = ${docPath} `);
+                window.history.pushState({ doc: docPath }, title, `?doc=${encodeURIComponent(docPath)}`);
             } catch (error) {
-                content.innerHTML = `< p > Error loading document: ${error.message}</p > `;
+                content.innerHTML = `<p>Error loading document: ${error.message}</p>`;
                 showDocView('Error');
             }
         };
@@ -338,7 +338,7 @@
 
             if (docPath) {
                 // Load document without adding to history again
-                fetch(`./ ${docPath}`)
+                fetch(`./${docPath}`)
                     .then(response => response.text())
                     .then(markdown => {
                         const html = window.marked.parse(markdown);
