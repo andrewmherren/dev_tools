@@ -17,6 +17,18 @@
 {% endif %}{% if execution_mode == 'host' %}4. Use host tasks from `.vscode/tasks.json`.
 {% endif %}
 
+## Available Tasks
+
+Use **Terminal > Run Task** or `Ctrl+Shift+B` (test tasks).
+
+- **test**: Run project tests (configure test runner as prompted){% if language in ['python', 'nodejs', 'rust'] %}
+- **typecheck**: Run type checking (configure tool as prompted){% endif %}
+- **lint**: Run code linting (configure linter as prompted)
+- **verify**: Run test, lint{% if language in ['python', 'nodejs', 'rust'] %}, and typecheck{% endif %} in parallel
+- **format**: Format code (configure formatter as prompted)
+- **sonar-scan** (optional): Run SonarQube analysis (requires `SONARQUBE_TOKEN` env var)
+- **trivy-scan** (optional): Scan for vulnerabilities and misconfigurations (requires Trivy CLI and dev server)
+
 ## Security
 
 - Keep tokens only in `.env` / `.env.local`.

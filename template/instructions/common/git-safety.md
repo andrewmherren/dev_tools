@@ -24,3 +24,10 @@ git config core.hooksPath .githooks
 .env.local
 .env.*.local
 ```
+
+## Verification and Secrets
+
+When running verification tasks (see agent-verification.md):
+- Verification MUST NOT require committing secrets.
+- If verification needs credentials, ensure they come from environment variables.
+- Mark verification steps requiring secrets as optional and document setup requirements.

@@ -2,8 +2,7 @@
   "servers": {
     "docs-mcp": {
       "type": "sse",
-      "url": "http://docs.localhost/sse"
-      // Fallback if .localhost routing is unavailable on your machine: "http://localhost/docs/sse"
+      "url": "http://localhost/docs/sse"
     },
     "filesystem": {
       "type": "stdio",

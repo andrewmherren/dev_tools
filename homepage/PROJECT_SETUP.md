@@ -247,6 +247,56 @@ sonar-scanner `
 
 ---
 
+## Optional VS Code Security & Quality Tasks
+
+If you used the Copier template, your project includes optional security scanning tasks:
+
+### `sonar-scan` Task
+
+Runs SonarQube analysis directly from VS Code.
+
+**Prerequisites:**
+
+- Install `sonar-scanner` CLI: `npm install -g sonarqube-scanner`
+- Set `SONARQUBE_TOKEN` environment variable (see above)
+
+**Behavior:**
+
+- **Host/hybrid mode**: Connects to `http://sonarqube.localhost`
+- **Container mode**: Connects to `http://sonarqube:9000`
+- **Non-blocking**: Skips gracefully if token not set
+
+**Run via:**
+
+- VS Code Command Palette: `Tasks: Run Task` → `sonar-scan`
+- Terminal: `sonar-scanner -Dsonar.host.url=http://sonarqube.localhost -Dsonar.token="$SONARQUBE_TOKEN"`
+
+### `trivy-scan` Task
+
+Scans your project for vulnerabilities and misconfigurations using Trivy.
+
+**Prerequisites:**
+
+- Install Trivy CLI: See [Trivy installation docs](https://aquasecurity.github.io/trivy/)
+- Dev tools server must be running (provides Trivy server)
+
+**Behavior:**
+
+- **Host/hybrid mode**: Connects to Trivy server at `http://localhost:8080`
+- **Container mode**: Connects to `http://trivy-server:8080`
+- **Non-blocking**: Reports findings but doesn't fail the workflow
+- Scans filesystem for: vulnerabilities, misconfigurations
+
+**Run via:**
+
+- VS Code Command Palette: `Tasks: Run Task` → `trivy-scan`
+- Terminal (host): `trivy fs --server http://localhost:8080 --scanners vuln,misconfig .`
+- Terminal (container): `trivy fs --server http://trivy-server:8080 --scanners vuln,misconfig .`
+
+**Note:** Both tasks are optional and designed to be non-blocking. They gracefully skip if dependencies or credentials are unavailable.
+
+---
+
 ## Using Ollama for Local LLMs
 
 ### Available Models

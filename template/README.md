@@ -90,6 +90,19 @@ The Copier task `tasks/merge_and_setup.py` runs on host and preserves prior beha
 - Container/hybrid modes generate `.devcontainer/devcontainer.json` with language-appropriate base image and in-container `postCreateCommand` installs.
 - Host mode removes `.devcontainer/` in the post-copy task and relies on host tasks in `.vscode/tasks.json`.
 
+## VS Code Tasks
+
+Generated projects include standard tasks in `.vscode/tasks.json`:
+
+- **test**: Language-specific test runner (marked as default test task)
+- **lint**: Code linting with safe placeholders for configuration
+- **typecheck**: Type checking (Python/Node/Rust only)
+- **verify**: Compound task running test + lint + typecheck in parallel
+- **format**: Code formatting placeholder
+- **build**: Conditional on language/execution mode (C++/Unreal/Godot)
+
+Tasks use safe echo placeholders before tooling is configured to avoid failing prescriptively. Concrete commands are provided where universally safe (e.g., `cargo test`, `npm test`).
+
 ## Security Defaults
 
 Generated projects include:
