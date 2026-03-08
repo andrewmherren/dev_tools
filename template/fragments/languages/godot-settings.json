@@ -1,0 +1,9 @@
+{
+  "[gdscript]": {
+    "editor.formatOnSave": true
+  },
+  "files.associations": {
+    "*.tscn": "plaintext",
+    "*.tres": "plaintext"
+  }
+}

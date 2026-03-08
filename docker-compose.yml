@@ -1,0 +1,248 @@
+networks:
+  dev-network:
+    driver: bridge
+  internal-network:
+    driver: bridge
+    internal: true
+
+volumes:
+  postgres-data:
+    driver: local
+  trivy-cache:
+    driver: local
+  drone-data:
+    driver: local
+
+services:
+  ollama:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile.nvidia-ollama
+    container_name: ollama-server
+    volumes:
+      - ${OLLAMA_STORAGE_PATH}:/root/.ollama
+    environment:
+      - OLLAMA_HOME=/home/ollama/.ollama
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_ORIGINS=*
+    tty: true
+    stdin_open: true
+    networks:
+      - dev-network
+      - internal-network
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 8g
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
+    restart: unless-stopped
+
+  docs-mcp:
+    container_name: docs-mcp-server
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile.docs-mcp
+    depends_on:
+      - ollama
+    volumes:
+      - ${DOCS_MCP_STORAGE_PATH}:/data
+    environment:
+      - OPENAI_API_BASE=http://ollama:11434/v1
+      - DOCS_MCP_SCRAPER_MAX_PAGES=2000
+      - DOCS_MCP_SCRAPER_DOCUMENT_MAX_SIZE=52428800
+      # If crashing during scraping, or if you need to reduce memory consumption
+      # from the allotted 3g to something lower like 2, you can reduce concurrency
+      # and sacrifice some performance.
+      - DOCS_MCP_SCRAPER_MAX_CONCURRENCY=3
+      - DOCS_MCP_SPLITTER_MAX_CHUNK_SIZE=5200
+      - DOCS_MCP_EMBEDDING_MODEL=openai:nomic-embed-text
+      - OPENAI_API_KEY=dummy
+    tty: true
+    stdin_open: true
+    networks:
+      - dev-network
+      - internal-network
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 3g
+    restart: unless-stopped
+
+  traefik:
+    container_name: ai-dev-traefik
+    image: traefik:v3.2
+    user: "0:0"
+    environment:
+      - DOCKER_API_VERSION=1.44
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    ports:
+      - 127.0.0.1:80:80
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - dev-network
+      - internal-network
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+    restart: unless-stopped
+
+  postgres:
+    container_name: postgres-server
+    image: pgvector/pgvector:pg15
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonarqube
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - internal-network
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    restart: unless-stopped
+
+  sonarqube:
+    container_name: sonarqube-server
+    image: sonarqube:10-community
+    depends_on:
+      - postgres
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://postgres:5432/sonarqube
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=sonar
+    volumes:
+      - ${SONARQUBE_STORAGE_PATH}/data:/opt/sonarqube/data
+      - ${SONARQUBE_STORAGE_PATH}/extensions:/opt/sonarqube/extensions
+      - ${SONARQUBE_STORAGE_PATH}/logs:/opt/sonarqube/logs
+    networks:
+      - internal-network
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+    restart: unless-stopped
+
+  trivy:
+    container_name: trivy-server
+    image: aquasec/trivy:latest
+    command: ["server", "--listen", "0.0.0.0:8080"]
+    volumes:
+      - trivy-cache:/root/.cache/trivy
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - dev-network
+      - internal-network
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    restart: unless-stopped
+
+  # Drone CI - Disabled until Git provider is configured
+  # Uncomment and configure DRONE_GITEA_SERVER, DRONE_GITEA_CLIENT_ID, DRONE_GITEA_CLIENT_SECRET in .env
+  # drone-server:
+  #   container_name: drone-server
+  #   image: drone/drone:2
+  #   environment:
+  #     - DRONE_GITEA_SERVER=${DRONE_GITEA_SERVER:-}
+  #     - DRONE_GITEA_CLIENT_ID=${DRONE_GITEA_CLIENT_ID:-}
+  #     - DRONE_GITEA_CLIENT_SECRET=${DRONE_GITEA_CLIENT_SECRET:-}
+  #     - DRONE_RPC_SECRET=${DRONE_RPC_SECRET}
+  #     - DRONE_SERVER_HOST=drone.localhost
+  #     - DRONE_SERVER_PROTO=http
+  #     - DRONE_USER_CREATE=${DRONE_USER_CREATE:-}
+  #   volumes:
+  #     - drone-data:/data
+  #   networks:
+  #     - internal-network
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   cap_drop:
+  #     - ALL
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 512m
+  #   restart: unless-stopped
+
+  # drone-agent:
+  #   container_name: drone-agent
+  #   image: drone/drone-runner-docker:1
+  #   depends_on:
+  #     - drone-server
+  #   environment:
+  #     - DRONE_RPC_PROTO=http
+  #     - DRONE_RPC_HOST=drone-server
+  #     - DRONE_RPC_SECRET=${DRONE_RPC_SECRET}
+  #     - DRONE_RUNNER_CAPACITY=2
+  #     - DRONE_RUNNER_NAME=local-agent
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   networks:
+  #     - dev-network
+  #     - internal-network
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   cap_drop:
+  #     - ALL
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 1g
+  #   restart: unless-stopped
+
+  homepage:
+    container_name: dev-homepage
+    image: nginx:alpine
+    volumes:
+      - ./homepage:/usr/share/nginx/html:ro
+    networks:
+      - internal-network
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+    deploy:
+      resources:
+        limits:
+          memory: 32m
+    restart: unless-stopped

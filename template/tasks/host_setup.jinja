@@ -1,0 +1,5 @@
+{% if execution_mode in ['host', 'hybrid'] %}
+- Install required SDK/toolchain on host.
+- Use `.vscode/tasks.json` to run build/run commands.
+- Keep secrets in `.env` and `.env.local` only.
+{% endif %}

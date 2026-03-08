@@ -1,0 +1,21 @@
+# Copilot Project Instructions
+
+This project was scaffolded from the unified Copier template.
+
+## Template Context
+
+- language: {{ language }}
+- execution_mode: {{ execution_mode }}
+
+## Security Patterns
+
+- **NEVER** read or expose content from `.env`, `.env.local`, or files matching `*secret*`, `*token*`, `*key*`
+- Store all tokens/secrets in `.env` / `.env.local` (never committed)
+- `.vscode/mcp.json` must not contain literal secrets; only environment variable references
+
+## Development Workflow
+
+{% if execution_mode in ['container', 'hybrid'] %}- Prefer container-based tooling and installs through `.devcontainer/devcontainer.json` `postCreateCommand`.
+{% else %}- Prefer host-native tools configured in `.vscode/tasks.json`.
+{% endif %}- Keep edits minimal and focused.
+- Preserve existing user changes during updates.

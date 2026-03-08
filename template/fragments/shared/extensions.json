@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "github.copilot",
+    "github.copilot-chat",
+    "GitHub.copilot-labs",
+    "eamodio.gitlens",
+    "redhat.vscode-yaml",
+    "streetsidesoftware.code-spell-checker",
+    "esbenp.prettier-vscode"
+  ]
+}

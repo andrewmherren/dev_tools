@@ -1,0 +1,6 @@
+[
+  {
+    "key": "shift+space",
+    "command": "cursorLineEnd"
+  }
+]

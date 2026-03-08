@@ -1,0 +1,27 @@
+{
+  "servers": {
+    "docs-mcp": {
+      "type": "sse",
+      "url": "http://docs.localhost/sse"
+      // Fallback if .localhost routing is unavailable on your machine: "http://localhost/docs/sse"
+    },
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
+      "description": "Direct filesystem access within workspace"
+    }
+  },
+  "disabledServers": {
+    "sonarqube": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "sonarqube-mcp-server"],
+      "env": {
+        "SONARQUBE_URL": "http://sonarqube.localhost",
+        "SONARQUBE_TOKEN": "${SONARQUBE_TOKEN}"
+      },
+      "description": "Code quality and security analysis"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "key": "ctrl+shift+h",
+    "command": "search-unreal-documentation",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+f1",
+    "command": "-search-unreal-documentation",
+    "when": "editorTextFocus"
+  }
+]

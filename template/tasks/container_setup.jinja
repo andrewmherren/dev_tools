@@ -1,0 +1,5 @@
+{% if execution_mode in ['container', 'hybrid'] %}
+- Use `.devcontainer/devcontainer.json` for dependency installation.
+- Do not install project dependencies in Copier tasks.
+- Open in VS Code and run **Reopen in Container**.
+{% endif %}

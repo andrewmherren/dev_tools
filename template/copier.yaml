@@ -1,0 +1,89 @@
+_min_copier_version: "9.0.0"
+_answers_file: ".copier-answers.yml"
+_templates_suffix: ".jinja"
+_exclude:
+  - "copier.yaml"
+  - "tasks"
+  - "fragments"
+  - "instructions"
+  - ".env"
+  - ".env.local"
+  - "__pycache__"
+
+project_name:
+  type: str
+  help: "Display name of your project"
+  default: "{{ _copier_conf.dst_path | basename }}"
+
+project_slug:
+  type: str
+  help: "Directory/package friendly slug"
+  default: "{{ project_name | lower | replace(' ', '_') | regex_replace('[^a-z0-9_]', '') }}"
+  validator: >-
+    {% if not (project_slug | regex_search('^[a-z0-9_]+$')) %}
+    Use only lowercase letters, numbers, and underscores.
+    {% endif %}
+
+description:
+  type: str
+  help: "One-line description"
+
+language:
+  type: str
+  help: "Primary language/project type"
+  choices:
+    - python
+    - nodejs
+    - rust
+    - godot
+    - unreal
+    - cpp
+  default: python
+
+execution_mode:
+  type: str
+  help: "Where development primarily runs"
+  choices:
+    - container
+    - host
+    - hybrid
+  default: container
+  validator: |
+    {% if language in ['python', 'nodejs', 'rust'] and execution_mode == 'host' %}
+    {{ language }} projects should use container or hybrid mode.
+    {% elif language == 'unreal' and execution_mode != 'host' %}
+    Unreal projects must use host mode.
+    {% else %}
+    {% endif %}
+
+python_package_manager:
+  type: str
+  help: "Python package manager"
+  choices:
+    - pip
+    - uv
+    - poetry
+  default: pip
+  when: "{{ language == 'python' }}"
+
+node_package_manager:
+  type: str
+  help: "Node package manager"
+  choices:
+    - npm
+    - pnpm
+    - yarn
+  default: npm
+  when: "{{ language == 'nodejs' }}"
+
+cpp_build_system:
+  type: str
+  help: "Primary build system for C++"
+  choices:
+    - cmake
+    - msbuild
+  default: cmake
+  when: "{{ language in ['cpp', 'unreal'] }}"
+
+_tasks:
+  - "{{ _copier_python }} {{ _copier_conf.src_path }}/tasks/merge_and_setup.py {{ language }} {{ execution_mode }}"

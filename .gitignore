@@ -1,0 +1,69 @@
+# Dev Environment - Git Ignore
+# This repo is the OS, not your project code.
+# Only files needed to run the environment should be committed.
+
+# ============================================
+# Environment Configuration (Machine-Specific)
+# ============================================
+.env
+.env.local
+.env.*.local
+docker-compose.override.yml
+
+
+# ============================================
+# Docker & Container Artifacts
+# ============================================
+.dockerignore
+*.log
+
+# ============================================
+# Service Data (Infrastructure Storage)
+# ============================================
+.server_data/
+
+
+# ============================================
+# Nginx & SSL Certificates
+# ============================================
+nginx/ssl/
+*.crt
+*.key
+*.pem
+
+
+# ============================================
+# IDE & Editor
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.classpath
+.c9/
+*.sublime-workspace
+
+
+# ============================================
+# OS & Temporary Files
+# ============================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================
+# Keep template files
+# ============================================
+!templates/**
+
+# ============================================
+# Local Development (if any)
+# ============================================
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
