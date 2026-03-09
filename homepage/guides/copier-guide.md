@@ -303,6 +303,82 @@ Generated projects include:
 - `.githooks/pre-commit` secret scan hook
 - `.github/instructions/secrets-management.md`
 
+## Available Agents
+
+Generated projects include specialized AI agents in `.github/agents/` that can be invoked directly in VS Code Copilot. These agents are designed for specific workflows and include tool restrictions to ensure safe, focused operation.
+
+### teacher
+
+**Purpose**: Interactive step-by-step learning and tutorial workflows
+
+**Invocation**: `@teacher walk me through implementing [feature]`
+
+**Key Features**:
+
+- Guides users through learning tasks one step at a time
+- Defaults to pseudocode/high-level patterns to encourage learning-by-doing
+- Provides production-ready code snippets when explicitly requested
+- Includes verification instructions for each step (following agent verification contract)
+- Can index new documentation sources when teaching topics without current docs
+- Never executes changes directly; guides user through implementation
+
+**Tools**: Read-only exploration (`read`, `search`, `glob`, `webSearch`) + docs-mcp operations (`search_docs`, `scrape_docs`, `refresh_version`)
+
+**Use Cases**:
+
+- Learning new language features or frameworks
+- Understanding project architecture
+- Implementing complex features step-by-step
+- Debugging with guided problem-solving
+- Establishing best practices through practice
+
+### research-agent
+
+**Purpose**: Evidence-based research using indexed documentation and web search
+
+**Invocation**: `@research-agent compare [technology A] and [technology B]`
+
+**Key Features**:
+
+- Performs concise, source-backed comparisons and recommendations
+- Prefers official documentation first
+- Separates verified facts from opinions
+- Cites sources and calls out trade-offs
+
+**Tools**: Read-only exploration + docs-mcp search operations
+
+**Use Cases**:
+
+- Technology evaluation and comparison
+- Finding best practices from official docs
+- Understanding API capabilities and limitations
+- Research without modifying code
+
+### documentation-indexer
+
+**Purpose**: Discovers and indexes official documentation into docs-mcp
+
+**Invocation**: `@documentation-indexer index documentation for [library/framework]`
+
+**Key Features**:
+
+- Finds official documentation URLs
+- Indexes documentation into local docs-mcp server
+- Refreshes existing indexed versions
+- Reports job status and completion
+
+**Tools**: Web search + docs-mcp management operations (`scrape_docs`, `refresh_version`, `list_jobs`)
+
+**Use Cases**:
+
+- Adding documentation for new dependencies
+- Keeping indexed docs current
+- Preparing documentation before research or learning sessions
+
+### Agent Customization
+
+Agents are copied only when destination files are missing (see [Merge Behavior](#merge-behavior-preserved)), so projects can customize agents in `.github/agents/` without interference from template updates. To add custom agents, create new `.agent.md` files following the YAML frontmatter pattern (see existing agents for examples).
+
 ## Adding a New Language
 
 1. Add `fragments/languages/<lang>-settings.json`.
