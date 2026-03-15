@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "printf '{\"continue\": true, \"hookSpecificOutput\": {\"hookEventName\": \"SessionStart\", \"additionalContext\": \"Workflow pack available: use @planner, @implementation, @reviewer or prompt commands such as /start-feature-design. For durable handoff, persist design notes in docs/design/ and plans in docs/plans/.\"}}'",
+        "windows": "powershell -NoProfile -Command \"Write-Output '{\\\"continue\\\": true, \\\"hookSpecificOutput\\\": {\\\"hookEventName\\\": \\\"SessionStart\\\", \\\"additionalContext\\\": \\\"Workflow pack available: use @planner, @implementation, @reviewer or prompt commands such as /start-feature-design. For durable handoff, persist design notes in docs/design/ and plans in docs/plans/.\\\"}}'\""
+      }
+    ]
+  }
+}

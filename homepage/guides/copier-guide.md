@@ -274,6 +274,9 @@ The Copier task `tasks/merge_and_setup.py` runs on host and preserves prior beha
 - `.vscode/keybindings.json`: union + deduplicate by command, project values winning
 - `.github/instructions/*`: copied only when destination file is missing
 - `.github/agents/*`: copied only when destination file is missing
+- `.github/skills/**`: copied only when destination files are missing
+- `.github/prompts/*`: copied only when destination file is missing
+- `.github/hooks/**`: copied only when destination files are missing
 
 ## Container vs Host
 
@@ -378,6 +381,77 @@ Generated projects include specialized AI agents in `.github/agents/` that can b
 ### Agent Customization
 
 Agents are copied only when destination files are missing (see [Merge Behavior](#merge-behavior-preserved)), so projects can customize agents in `.github/agents/` without interference from template updates. To add custom agents, create new `.agent.md` files following the YAML frontmatter pattern (see existing agents for examples).
+
+## Copilot Workflow Pack
+
+Generated projects now include a Copilot-native workflow pack that recreates the main Superpowers-style development stages using standard VS Code customization primitives.
+
+### Included custom agents
+
+- `planner`: Design and task planning before implementation.
+- `implementation`: Execute approved tasks with explicit verification.
+- `reviewer`: Severity-first review focused on defects and regressions.
+
+These are in addition to `teacher`, `research-agent`, and `documentation-indexer`.
+
+For non-trivial work, these agents are intended to hand off through persisted docs as well as chat context:
+
+- `docs/design/<feature>.md` for approved design decisions.
+- `docs/plans/<feature>-plan.md` for executable task plans and verification steps.
+
+### Included skills
+
+Skills are copied to `.github/skills/` and can be invoked as slash commands or loaded automatically when relevant.
+
+- `brainstorming`: Purpose: clarify requirements, alternatives, constraints, and success criteria before coding. Usage: run when a request is still high-level or ambiguous.
+- `writing-plans`: Purpose: convert an approved design into small, verifiable implementation tasks. Usage: run after design approval and before coding starts.
+- `test-driven-development`: Purpose: enforce red-green-refactor for behavior changes. Usage: run while implementing new or changed logic.
+- `systematic-debugging`: Purpose: debug from evidence and hypotheses instead of guesswork. Usage: run when tests/build/runtime fail.
+- `verification-before-completion`: Purpose: require explicit verification evidence before marking work done. Usage: run at the end of each meaningful task.
+- `requesting-code-review`: Purpose: prepare a change for reviewer consumption with risk and verification context. Usage: run before requesting review.
+- `using-git-worktrees`: Purpose: isolate parallel or risky work in dedicated worktrees/branches. Usage: run before starting multi-track work.
+- `finishing-development-branch`: Purpose: close out a branch with final verification and cleanup. Usage: run when implementation and feedback are complete.
+
+### Included prompt files
+
+Prompt files are copied to `.github/prompts/` and provide quick entry points for common workflows.
+
+- `/start-feature-design`: Purpose: kick off design and planning for a feature. Usage: first step for new feature work.
+- `/implement-approved-plan`: Purpose: execute the approved plan in small verified steps. Usage: after plan approval.
+- `/run-tdd-cycle`: Purpose: run one focused red-green-refactor cycle. Usage: during implementation of a specific behavior.
+- `/review-implementation`: Purpose: run severity-first review against plan and risk areas. Usage: after implementation and before merge.
+- `/index-documentation`: Purpose: discover and index official docs into docs-mcp. Usage: when docs are missing/outdated for current work.
+
+### Included hook
+
+A session-start hook is copied to `.github/hooks/workflow-session-start.json`.
+
+Purpose: give the agent a brief reminder at the beginning of a chat session that the workflow pack exists and that durable handoff docs should live in `docs/design/` and `docs/plans/`.
+
+What it does: it injects a short startup context message into the session. It does not edit files, run tests, or force the workflow by itself.
+
+### How Stage Handoff Works
+
+By default, handoff can use chat context, but this workflow pack now prefers durable file-based handoff for non-trivial work.
+
+1. Stage 1 (`planner` or `/start-feature-design`) produces a design summary + task plan in chat.
+2. Stage 1 should also persist the approved design to `docs/design/<feature>.md` and the task plan to `docs/plans/<feature>-plan.md`.
+3. Stage 2 (`implementation` or `/implement-approved-plan`) uses those docs as the durable handoff source, plus current code and verification output.
+4. Stage 3 (`reviewer` or `/review-implementation`) reviews implementation against the same saved design/plan docs and verification evidence.
+
+Generated projects include starter folders for these artifacts:
+
+- `docs/design/`
+- `docs/plans/`
+
+Optional PR/checklist notes can still be used for review criteria, but the design and plan docs should be the main handoff artifacts.
+
+### Suggested flow
+
+1. Run `/start-feature-design` or use `@planner`.
+2. Save or update `docs/design/<feature>.md` and `docs/plans/<feature>-plan.md`.
+3. Run `/implement-approved-plan` or use `@implementation`.
+4. Run `/review-implementation` or use `@reviewer`.
 
 ## Adding a New Language
 

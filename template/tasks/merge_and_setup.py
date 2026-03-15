@@ -102,8 +102,9 @@ def merge_vscode_extensions(dst_file: Path, overlays: list[Path]) -> None:
             if isinstance(recs, list):
                 template_recommendations.extend([str(item) for item in recs])
 
+    recommendations = [str(item) for item in project_recommendations]
     project_data["recommendations"] = dedupe_extensions(
-        [str(item) for item in project_recommendations] + template_recommendations
+        recommendations + template_recommendations
     )
     write_json(dst_file, project_data)
 
@@ -152,6 +153,17 @@ def copy_md_files_if_missing(src_dir: Path, dst_dir: Path) -> None:
         copy_if_missing(file, dst_dir / file.name)
 
 
+def copy_tree_files_if_missing(src_dir: Path, dst_dir: Path) -> None:
+    """Copy files recursively, preserving existing destination files."""
+    if not src_dir.exists():
+        return
+
+    file_iter = (path for path in src_dir.rglob("*") if path.is_file())
+    for src_file in sorted(file_iter):
+        relative = src_file.relative_to(src_dir)
+        copy_if_missing(src_file, dst_dir / relative)
+
+
 def maybe_make_executable(path: Path) -> None:
     if not path.exists():
         return
@@ -177,6 +189,9 @@ def main() -> int:
     vscode_dir.mkdir(parents=True, exist_ok=True)
     (github_dir / "instructions").mkdir(parents=True, exist_ok=True)
     (github_dir / "agents").mkdir(parents=True, exist_ok=True)
+    (github_dir / "skills").mkdir(parents=True, exist_ok=True)
+    (github_dir / "prompts").mkdir(parents=True, exist_ok=True)
+    (github_dir / "hooks").mkdir(parents=True, exist_ok=True)
 
     shared_dir = src_root / "fragments" / "shared"
     language_dir = src_root / "fragments" / "languages"
@@ -213,6 +228,15 @@ def main() -> int:
     )
     copy_md_files_if_missing(
         src_root / "instructions" / "agents", github_dir / "agents"
+    )
+    copy_tree_files_if_missing(
+        src_root / "instructions" / "skills", github_dir / "skills"
+    )
+    copy_md_files_if_missing(
+        src_root / "instructions" / "prompts", github_dir / "prompts"
+    )
+    copy_tree_files_if_missing(
+        src_root / "instructions" / "hooks", github_dir / "hooks"
     )
 
     pre_commit_src = shared_dir / "pre-commit-secret-scan.sh"
