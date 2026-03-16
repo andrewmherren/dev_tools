@@ -6,6 +6,10 @@
 
 - Language: {{ language }}
 - Execution mode: {{ execution_mode }}
+{% if language == 'godot' %}
+- Godot target: {{ godot_version }}
+- Test framework: {{ godot_test_framework }}
+{% endif %}
 
 ## Getting Started
 
@@ -28,6 +32,84 @@ Use **Terminal > Run Task** or `Ctrl+Shift+B` (test tasks).
 - **format**: Format code (configure formatter as prompted)
 - **sonar-scan** (optional): Run SonarQube analysis (requires `SONARQUBE_TOKEN` env var)
 - **trivy-scan** (optional): Scan for vulnerabilities and misconfigurations (requires Trivy CLI and dev server)
+{% if language == 'godot' %}
+
+### Godot Workflow Tasks
+
+- **run-godot**: Launch the project with host Godot editor runtime.
+- **godot-import**: Run headless import pass to surface import/setup issues in CI-friendly mode.
+- **godot-parse-check**: Reminder task for script parse-only checks using official `--check-only` flow.
+- **godot-export-debug**: Reminder task for command-line debug export with your project export preset.
+
+## Godot Workflow Model
+
+- Use Godot editor for visual authoring, scene composition, animation, and inspector-driven workflows.
+- Use VS Code + tasks for script-heavy changes, tests, export automation, and AI-assisted planning/review.
+- Agent teams are useful even without editor control: planning/research/implementation/review can be automated, then validated in-editor by a human checkpoint.
+
+### Recommended Verification Split
+
+- **Automatable**: docs lookup, script edits, import pass, parse checks, test commands, export commands.
+- **Manual editor check**: scene wiring, animation state machines, physics tuning, VFX/audio tuning, and import warning triage.
+
+## Optional Community Godot MCP Integration (Project-Local)
+
+No official first-party Godot MCP server exists today. If you want deeper editor/project automation, keep integration local to this project with opt-in files.
+
+This template generated:
+
+- `docker-compose.godot-mcp.yml`
+- `.vscode/mcp.godot.json`
+- `.vscode/mcp.json` includes a `disabledServers.godot-mcp` block
+
+Next steps:
+
+1. Start the generated overlay: `docker compose -f docker-compose.godot-mcp.yml up -d`.
+2. Enable `godot-mcp` by moving it from `disabledServers` to `servers` in `.vscode/mcp.json`.
+3. Start the overlay only when needed so base dev_tools remains unchanged.
+
+Example compose overlay skeleton:
+
+```yaml
+services:
+   godot-mcp:
+      image: node:20-alpine
+      restart: unless-stopped
+      working_dir: /workspace
+      command:
+         - sh
+         - -lc
+         - >
+            npx -y gopeak
+      environment:
+         GOPEAK_BRIDGE_HOST: "0.0.0.0"
+         GODOT_BRIDGE_PORT: "6505"
+         GOPEAK_TOOL_PROFILE: "compact"
+      ports:
+         - "6505:6505"
+      volumes:
+         - ./:/workspace:rw
+```
+
+Example MCP overlay skeleton:
+
+```json
+{
+   "servers": {
+      "godot-mcp": {
+         "type": "sse",
+         "url": "http://localhost:6505/mcp"
+      }
+   }
+}
+```
+
+Safety recommendations:
+
+- Keep Godot MCP optional and disabled by default.
+- Prefer official Godot LSP/DAP/CLI for long-term baseline stability.
+- Pin community MCP server versions and review maintenance activity before adoption.
+{% endif %}
 
 ## Security
 

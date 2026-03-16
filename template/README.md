@@ -254,6 +254,7 @@ Template prompts include:
 - `language` (`python`, `nodejs`, `rust`, `godot`, `unreal`, `cpp`)
 - `execution_mode` (`container`, `host`, `hybrid`)
 - language-specific conditional prompts (`python_package_manager`, `node_package_manager`, `cpp_build_system`)
+- Godot-only prompts (`godot_version`, `godot_test_framework`)
 
 ### Execution mode quick guide
 
@@ -273,6 +274,8 @@ The Copier task `tasks/merge_and_setup.py` runs on host and preserves prior beha
 - `.github/skills/**`: copied only when destination files are missing
 - `.github/prompts/*`: copied only when destination file is missing
 - `.github/hooks/**`: copied only when destination files are missing
+- `.vscode/mcp.json`: merged from shared + language overlay (project values win)
+- Godot MCP scaffolds (`.vscode/mcp.godot.json`, `docker-compose.godot-mcp.yml`) copied when `language=godot`
 
 ## Container vs Host
 
@@ -291,6 +294,13 @@ Generated projects include standard tasks in `.vscode/tasks.json`:
 - **build**: Conditional on language/execution mode (C++/Unreal/Godot)
 
 Tasks use safe echo placeholders before tooling is configured to avoid failing prescriptively. Concrete commands are provided where universally safe (e.g., `cargo test`, `npm test`).
+
+For Godot projects, generated tasks also include host/hybrid workflow helpers:
+
+- `run-godot`
+- `godot-import`
+- `godot-parse-check`
+- `godot-export-debug`
 
 ## Security Defaults
 

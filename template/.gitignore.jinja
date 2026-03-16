@@ -27,3 +27,10 @@ Cargo.lock
 
 # Local documentation
 LOCAL_*
+
+{% if language == 'godot' %}
+# Godot editor/import caches
+.godot/
+.godot4/
+*.import
+{% endif %}

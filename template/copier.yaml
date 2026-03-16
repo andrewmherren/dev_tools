@@ -40,6 +40,24 @@ language:
     - cpp
   default: python
 
+godot_version:
+  type: str
+  help: "Godot engine version target"
+  choices:
+    - "4.6"
+    - "4.x"
+  default: "4.6"
+  when: "{{ language == 'godot' }}"
+
+godot_test_framework:
+  type: str
+  help: "Godot test framework"
+  choices:
+    - gut
+    - none
+  default: none
+  when: "{{ language == 'godot' }}"
+
 execution_mode:
   type: str
   help: "Where development primarily runs"

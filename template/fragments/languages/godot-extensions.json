@@ -1,6 +1,5 @@
 {
   "recommendations": [
-    "geequlim.godot-tools",
-    "ms-vscode.cpptools"
+    "geequlim.godot-tools"
   ]
 }

@@ -1,9 +1,22 @@
 {
   "[gdscript]": {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4
   },
   "files.associations": {
-    "*.tscn": "plaintext",
-    "*.tres": "plaintext"
+    "*.gd": "gdscript",
+    "*.tscn": "ini",
+    "*.tres": "ini"
+  },
+  "files.watcherExclude": {
+    "**/.godot/**": true,
+    "**/.godot4/**": true,
+    "**/*.import": true
+  },
+  "search.exclude": {
+    "**/.godot/**": true,
+    "**/.godot4/**": true,
+    "**/*.import": true
   }
 }

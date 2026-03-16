@@ -18,6 +18,7 @@ Testing extensions were added selectively based on ecosystem maturity and integr
 
 - **Rust** (`rust-extensions.json`): `rust-analyzer` already provides excellent built-in test support with inline test running and debugging
 - **Godot** (`godot-extensions.json`): Limited VS Code testing ecosystem; GUT (Godot Unit Test) integration is project-specific and not universally applicable
+- Godot defaults intentionally stay minimal: `godot-tools` plus task-level guidance for official CLI checks and optional GUT setup
 - **Unreal** (`unreal-extensions.json`): Testing via built-in Automation Framework accessed through Unreal Editor; minimal VS Code integration available
 
 ## File Types
@@ -25,6 +26,8 @@ Testing extensions were added selectively based on ecosystem maturity and integr
 - `*-extensions.json`: Recommended VS Code extensions
 - `*-settings.json`: Language-specific VS Code settings
 - `*-keybindings.json`: Language-specific keyboard shortcuts (rare; currently only Unreal)
+- `godot-mcp.json`: Godot-only MCP overlay merged into `.vscode/mcp.json`
+- `godot-compose-mcp.yml`: Godot-only compose scaffold copied to project root
 
 ## Merge Behavior
 

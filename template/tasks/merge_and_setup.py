@@ -138,6 +138,23 @@ def merge_keybindings(dst_file: Path, overlays: list[Path]) -> None:
     write_json(dst_file, list(merged_map.values()))
 
 
+def merge_mcp_config(dst_file: Path, overlays: list[Path]) -> None:
+    project_config = load_json(dst_file, {})
+    if not isinstance(project_config, dict):
+        project_config = {}
+
+    template_config: dict[str, Any] = {}
+    for overlay in overlays:
+        if not overlay.exists():
+            continue
+        overlay_data = load_json(overlay, {})
+        if isinstance(overlay_data, dict):
+            template_config = deep_merge_overlay_wins(template_config, overlay_data)
+
+    merged = deep_merge_project_wins(project_config, template_config)
+    write_json(dst_file, merged)
+
+
 def copy_if_missing(src: Path, dst: Path) -> bool:
     if dst.exists() or not src.exists():
         return False
@@ -212,12 +229,15 @@ def main() -> int:
         execution_dir / f"{execution_mode}-keybindings.json",
         language_dir / f"{language}-keybindings.json",
     ]
+    mcp_overlays = [
+        shared_dir / "mcp.json",
+        language_dir / f"{language}-mcp.json",
+    ]
 
     merge_vscode_settings(vscode_dir / "settings.json", settings_overlays)
     merge_vscode_extensions(vscode_dir / "extensions.json", extensions_overlays)
     merge_keybindings(vscode_dir / "keybindings.json", keybindings_overlays)
-
-    copy_if_missing(shared_dir / "mcp.json", vscode_dir / "mcp.json")
+    merge_mcp_config(vscode_dir / "mcp.json", mcp_overlays)
 
     copy_md_files_if_missing(
         src_root / "instructions" / "common", github_dir / "instructions"
@@ -243,6 +263,16 @@ def main() -> int:
     pre_commit_dst = dst_path / ".githooks" / "pre-commit"
     if copy_if_missing(pre_commit_src, pre_commit_dst):
         maybe_make_executable(pre_commit_dst)
+
+    if language == "godot":
+        copy_if_missing(
+            language_dir / "godot-mcp.json",
+            vscode_dir / "mcp.godot.json",
+        )
+        copy_if_missing(
+            language_dir / "godot-compose-mcp.yml",
+            dst_path / "docker-compose.godot-mcp.yml",
+        )
 
     if execution_mode == "host":
         shutil.rmtree(dst_path / ".devcontainer", ignore_errors=True)
