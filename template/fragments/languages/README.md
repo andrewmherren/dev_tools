@@ -27,7 +27,6 @@ Testing extensions were added selectively based on ecosystem maturity and integr
 - `*-settings.json`: Language-specific VS Code settings
 - `*-keybindings.json`: Language-specific keyboard shortcuts (rare; currently only Unreal)
 - `godot-mcp.json`: Godot-only MCP overlay merged into `.vscode/mcp.json`
-- `godot-compose-mcp.yml`: Godot-only compose scaffold copied to project root
 
 ## Merge Behavior
 

@@ -52,63 +52,18 @@ Use **Terminal > Run Task** or `Ctrl+Shift+B` (test tasks).
 - **Automatable**: docs lookup, script edits, import pass, parse checks, test commands, export commands.
 - **Manual editor check**: scene wiring, animation state machines, physics tuning, VFX/audio tuning, and import warning triage.
 
-## Optional Community Godot MCP Integration (Project-Local)
+## Optional Community Godot MCP Integration
 
-No official first-party Godot MCP server exists today. If you want deeper editor/project automation, keep integration local to this project with opt-in files.
+No official first-party Godot MCP server exists today. This template includes [GoPeak](https://github.com/HaD0Yun/Gopeak-godot-mcp) as an optional disabled-by-default community MCP server for deeper editor/project automation.
 
-This template generated:
+To enable:
 
-- `docker-compose.godot-mcp.yml`
-- `.vscode/mcp.godot.json`
-- `.vscode/mcp.json` includes a `disabledServers.godot-mcp` block
+1. Edit `.vscode/mcp.json` and move `godot-mcp` from `disabledServers` to `servers`.
+2. Ensure Node.js is installed on host (`npx` is required).
+3. If GoPeak auto-detection fails, set `GODOT_PATH` environment variable to your Godot 4.x executable path.
+4. Restart the MCP server in VS Code.
 
-Next steps:
-
-1. Start the generated overlay: `docker compose -f docker-compose.godot-mcp.yml up -d`.
-2. Enable `godot-mcp` by moving it from `disabledServers` to `servers` in `.vscode/mcp.json`.
-3. Start the overlay only when needed so base dev_tools remains unchanged.
-
-Example compose overlay skeleton:
-
-```yaml
-services:
-   godot-mcp:
-      image: node:20-alpine
-      restart: unless-stopped
-      working_dir: /workspace
-      command:
-         - sh
-         - -lc
-         - >
-            npx -y gopeak
-      environment:
-         GOPEAK_BRIDGE_HOST: "0.0.0.0"
-         GODOT_BRIDGE_PORT: "6505"
-         GOPEAK_TOOL_PROFILE: "compact"
-      ports:
-         - "6505:6505"
-      volumes:
-         - ./:/workspace:rw
-```
-
-Example MCP overlay skeleton:
-
-```json
-{
-   "servers": {
-      "godot-mcp": {
-         "type": "sse",
-         "url": "http://localhost:6505/mcp"
-      }
-   }
-}
-```
-
-Safety recommendations:
-
-- Keep Godot MCP optional and disabled by default.
-- Prefer official Godot LSP/DAP/CLI for long-term baseline stability.
-- Pin community MCP server versions and review maintenance activity before adoption.
+MCP integration runs in stdio mode on the host using `npx -y gopeak`. Prefer official Godot LSP/DAP/CLI for long-term baseline stability. GoPeak is useful for automatable workflows (planning, script edits, import checks) but not for manual editor tasks (scene composition, animation tuning).
 {% endif %}
 
 ## Security

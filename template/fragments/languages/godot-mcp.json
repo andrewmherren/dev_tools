@@ -1,9 +1,14 @@
 {
   "disabledServers": {
     "godot-mcp": {
-      "type": "sse",
-      "url": "http://localhost:6505/mcp",
-      "description": "GoPeak Godot MCP (disabled by default; move to servers to enable)"
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "gopeak"],
+      "env": {
+        "GOPEAK_TOOL_PROFILE": "compact",
+        "GODOT_PATH": "${GODOT_PATH}"
+      },
+      "description": "GoPeak Godot MCP over stdio (disabled by default; move to servers to enable)"
     }
   }
 }

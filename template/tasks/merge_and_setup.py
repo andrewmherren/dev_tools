@@ -269,10 +269,6 @@ def main() -> int:
             language_dir / "godot-mcp.json",
             vscode_dir / "mcp.godot.json",
         )
-        copy_if_missing(
-            language_dir / "godot-compose-mcp.yml",
-            dst_path / "docker-compose.godot-mcp.yml",
-        )
 
     if execution_mode == "host":
         shutil.rmtree(dst_path / ".devcontainer", ignore_errors=True)
